@@ -1,17 +1,50 @@
-- name: Install dependencies
-  run: npm install
+name: Assessment CI
 
-- name: Generate Prisma client
-  run: npx prisma generate
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
-- name: Run migrations
-  run: npx prisma migrate deploy
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
 
-- name: Seed database
-  run: npx prisma db seed
+    steps:
+      # Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-- name: Run top-workplaces script
-  run: npm run start:topWorkplaces
+      # Use Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-- name: Run top-workers script
-  run: npm run start:topWorkers
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Generate Prisma client
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      # Run migrations (deploy mode for CI)
+      - name: Run migrations
+        run: npx prisma migrate deploy
+
+      # Seed the database
+      - name: Seed database
+        run: npx prisma db seed
+
+      # Build the server (if using Nest)
+      - name: Build server
+        run: npm run build
+
+      # Run top workplaces script
+      - name: Run top workplaces script
+        run: npm run start:topWorkplaces
+
+      # Run top workers script
+      - name: Run top workers script
+        run: npm run start:topWorkers
